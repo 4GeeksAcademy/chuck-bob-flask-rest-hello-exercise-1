@@ -26,6 +26,15 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 
+users = [
+    { "username": "Chuck", "password": "Bob" },
+    { "username": "Jimbo", "password": "Lee" }
+]
+
+
+
+
+
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -36,6 +45,8 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+
+
 @app.route('/user', methods=['GET'])
 def handle_hello():
 
@@ -43,7 +54,31 @@ def handle_hello():
         "msg": "Hello, this is your GET /user response "
     }
 
-    return jsonify(response_body), 200
+    json_text = jsonify(users)
+    return json_text, 200
+
+
+@app.route('/user', methods=['POST'])
+def add_new_user():
+    request_body = request.json
+    users.append(request_body)
+    return jsonify(users)
+
+@app.route('/user/<int:position>', methods=['PUT'])
+def add_update_user(position):
+    request_body = request.json
+    users[position] = request_body
+    return jsonify(users[position])
+
+
+@app.route('/user/<int:position>', methods=['DELETE'])
+def delete_user(position):
+    print("This is the position to delete:", position)
+    deleted = users.pop(position)
+    return jsonify({"deleted":deleted})
+
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
